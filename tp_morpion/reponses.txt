@@ -1,0 +1,60 @@
+TP Morpion - reponses
+
+Lancer : python main.py            (exos 2, 3, self-play et symetries)
+         python main.py 2          (juste l'exo 2)
+         python main.py jouer      (jouer contre l'IA, apres avoir lance l'exo 3)
+
+Exercice 2
+
+Q8 : avec la value function a 0.5 partout et sans apprentissage, greedy_move choisit
+au hasard. Sur 20000 parties on trouve environ X 58-59%, O 29%, nul 12%, ce qui
+correspond a ce qui est attendu.
+
+Exercice 3
+
+Q3 : si on joue uniquement en greedy, l'IA ne visite que les etats qu'elle croit
+deja bons. Des qu'un coup a donne une victoire elle va le rejouer et ne testera
+jamais les autres, meme s'ils sont meilleurs. Elle ne joue donc pas forcement moins
+bien (contre le joueur random elle gagne quand meme beaucoup) mais rien ne garantit
+qu'elle trouve la strategie optimale, ca depend des premieres parties. Une valeur
+initiale plus haute (genre 1, initialisation optimiste) pousse l'IA a essayer les
+etats jamais vus, puisqu'ils ont l'air meilleurs que ceux deja testes qui ont baisse.
+Ca force une exploration au debut.
+
+Q5 : si on ne met pas a jour pendant les coups exploratoires, la value function
+estime la probabilite de gagner en jouant ensuite de maniere greedy (la politique
+optimale). Si on apprend aussi pendant l'exploration, elle estime la probabilite de
+gagner avec la politique qu'on suit vraiment, exploration comprise (donc des valeurs
+un peu plus basses pres des etats ou une erreur coute cher). La premiere est
+meilleure si on arrete d'explorer apres l'entrainement, la deuxieme est plus
+"prudente" et correspond a ce qui se passe vraiment pendant l'entrainement.
+Dans nos tests les deux donnent a peu pres les memes resultats contre random.
+
+Q7 : si les deux joueurs apprennent en meme temps, chacun s'adapte a l'autre et
+l'adversaire n'est plus fixe. Ils finissent par converger vers le jeu optimal des
+deux cotes, donc que des matchs nuls. La value function est differente : elle ne
+profite plus des erreurs d'un joueur random, elle apprend a ne jamais perdre.
+Attention, il faut que le nul vaille plus qu'une defaite (on a mis 0.5), sinon le
+joueur O n'a aucune raison de bloquer et X gagne tout le temps.
+
+Q8 : play_game2 dans rl.py. Apres ~20000 parties on a 100% de nuls en greedy.
+La value function apprise de cette facon gagne toujours ~99% contre random et next.
+
+Q9 : on pourrait ramener chaque grille a une forme canonique (la plus petite parmi
+ses 8 symetries : 4 rotations x miroir). Il y a environ 5 fois moins d'etats a
+apprendre (on passe d'environ 2200 a 400 etats), et chaque partie met a jour la
+valeur pour toutes les grilles symetriques d'un coup, donc on apprend plus vite.
+Par contre si l'adversaire n'est pas symetrique (il prefere le cote droit par
+exemple), deux grilles symetriques n'ont pas la meme probabilite de gain, et les
+fusionner ferait perdre de l'info. Dans ce cas il vaut mieux ne pas utiliser les
+symetries.
+
+Q10 : ameliorations faites :
+- hash incremental : le code de la grille (en base 3) est mis a jour dans play et
+  undo, plus besoin de reconstruire une chaine a chaque fois.
+- symetries (option sym=True), voir Q9 : ca converge plus vite en nombre de parties
+  mais chaque coup coute plus cher a calculer (8 transformations).
+- on met directement 1 ou 0 sur les etats finaux donc greedy_move voit tout de suite
+  un coup gagnant.
+Autres idees : faire diminuer alpha et eps au fil des parties, entrainer contre
+opponent_next puis contre soi-meme, garder en cache les coups greedy.

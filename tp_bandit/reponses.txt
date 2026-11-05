@@ -1,0 +1,46 @@
+TP bandit a N bras - reponses
+
+Lancer : pip install -r requirements.txt
+         python main.py          (tous les exos, les graphes sont enregistres en .png)
+         python main.py 4 6      (seulement certains exos)
+
+Exercice 1 : ex1_un_bandit.png et ex1_trois_bandits.png. On a bien une gaussienne
+centree sur avg, et pour 3 bandits trois pics a des positions differentes.
+
+Exercice 3 : python main.py 3 affiche pour chaque iteration la recompense et si le
+choix etait optimal.
+
+Exercice 4 : ex4_un_joueur.png, ex4_epsilons.png
+Q6 : au debut les trois courbes montent pareil, eps=0 monte meme un peu plus vite car
+il ne perd pas de coups a explorer. Mais eps=0 se bloque tres vite sur un bras qui
+n'est souvent pas le meilleur (environ 35% d'action optimale, recompense ~1.0) et ne
+change plus jamais. eps=0.1 explore beaucoup, trouve le meilleur bras plus vite et
+monte a ~80% d'optimalite (il ne peut pas depasser ~91% puisqu'il joue au hasard 10%
+du temps). eps=0.01 apprend plus lentement mais a long terme il devrait finir au
+dessus de eps=0.1 car il explore moins (jusqu'a ~99%).
+
+Exercice 5 : ex5_optimiste.png (meme Ban10 pour les deux joueurs)
+Q4 : au debut l'optimiste est moins bon : toutes les valeurs valent 5, chaque bras
+essaye decoit et baisse, donc le joueur passe d'un bras a l'autre, c'est de
+l'exploration forcee. On voit un pic vers l'etape 10 quand il a teste tous les bras
+une fois et prend le meilleur, puis ca redescend car celui-ci baisse aussi sous les
+autres qui sont encore haut. Ensuite, une fois les estimations correctes, il
+n'explore plus du tout et depasse eps-greedy (~86% contre ~80%). Par contre ca ne
+marche que pour l'exploration du debut, pas si le probleme change dans le temps.
+
+Exercice 6 : ex6_ucb.png (c=2)
+Q4 : les 10 premiers coups UCB essaye chaque bras une fois (N=0 donc bras maximal),
+d'ou le pic a l'etape 11. Apres UCB est meilleur que eps-greedy : il explore surtout
+les bras dont l'estimation est incertaine ou prometteuse au lieu d'explorer au
+hasard, et le bonus diminue au fur et a mesure que N augmente. A long terme il
+continue d'explorer un peu (ln t augmente) mais beaucoup moins que eps=0.1.
+
+Exercice 7 (bonus) : ex7_moving_eps.png, ex7_moving_compare.png
+La moyenne de chaque bandit suit un sinus de periode 100 a 500 coups, avec min et
+max aleatoires. Le meilleur bras change donc au cours du temps.
+Avec un pas 1/n les vieilles recompenses pesent autant que les nouvelles, donc
+l'estimation ne suit plus le bandit apres un moment (eps=0.1 pas 1/n plafonne
+vers 65%). Avec un pas constant (0.1) l'estimation suit les changements et on
+reste vers 80%. L'optimiste avec pas constant marche bien ici, et UCB aussi. Sans
+exploration (eps=0) c'est le pire, il ne voit jamais qu'un autre bras est devenu
+meilleur.
